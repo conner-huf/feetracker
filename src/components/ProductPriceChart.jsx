@@ -11,29 +11,19 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
+import useNormalizedData from "../hooks/useNormalizedData";
+import useDateFilter from "../hooks/useDateFilter";
+import PercentChangeModule from "./PercentChangeModule";
 
 const ProductPriceChart = ({ productName }) => {
-  const [priceData, setPriceData] = useState([]);
-  const [dateLabels, setDateLabels] = useState([]);
+  const [observations, setObservations] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/economic/product/${productName}`);
-        const observations = response.data?.price_observations?.observations || [];
-
-        // Filter observations between 1/1/2024 and 1/1/2025
-        const filteredData = observations.filter((obs) => {
-          const date = new Date(obs.date);
-          return date >= new Date("2020-01-01") && date < new Date("2025-01-01");
-        });
-
-        const dates = filteredData.map((obs) => obs.date);
-        const prices = filteredData.map((obs) => parseFloat(obs.value));
-
-        setDateLabels(dates);
-        setPriceData(prices);
+        setObservations(response.data?.price_observations?.observations || []);
       } catch (err) {
         setError("Failed to fetch product data. Please try again later.");
         console.error(err);
@@ -42,6 +32,13 @@ const ProductPriceChart = ({ productName }) => {
 
     fetchData();
   }, [productName]);
+  
+  const { filteredDates, filteredPrices } = useDateFilter(
+    observations,
+    "2025-01-01",
+    "2029-01-01"
+  );
+  const { normalizedDates, normalizedPrices } = useNormalizedData(filteredDates, filteredPrices, 10);
 
   if (error) {
     return <div className="error">{error}</div>;
@@ -71,11 +68,11 @@ const ProductPriceChart = ({ productName }) => {
   }
 
   const data = {
-    labels: dateLabels,
+    labels: normalizedDates,
     datasets: [
       {
         label: "Price",
-        data: priceData,
+        data: normalizedPrices,
         borderColor: "rgb(21, 168, 168)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         fill: true,
@@ -86,6 +83,7 @@ const ProductPriceChart = ({ productName }) => {
   return (
     <div className="chart-container">
       <Line options={options} data={data} />
+      <PercentChangeModule priceData={filteredPrices} />
     </div>
   );
 };
