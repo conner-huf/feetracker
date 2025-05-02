@@ -15,14 +15,17 @@ import useNormalizedData from "../hooks/useNormalizedData";
 import useDateFilter from "../hooks/useDateFilter";
 import PercentChangeModule from "./PercentChangeModule";
 
-const ProductPriceChart = ({ productName }) => {
+const ProductPriceChart = ({ productName, dateRange }) => {
   const [observations, setObservations] = useState([]);
   const [error, setError] = useState(null);
+
+  const BASE_URL = "https://unifiedbackendwebapp-hqerfscxedd0asfj.eastus-01.azurewebsites.net/economic/product/"
+  // const BASE_URL = "http://localhost:8000/economic/product/" ;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/economic/product/${productName}`);
+        const response = await axios.get(`${BASE_URL}${productName}`);
         setObservations(response.data?.price_observations?.observations || []);
       } catch (err) {
         setError("Failed to fetch product data. Please try again later.");
@@ -35,8 +38,8 @@ const ProductPriceChart = ({ productName }) => {
   
   const { filteredDates, filteredPrices } = useDateFilter(
     observations,
-    "2025-01-01",
-    "2029-01-01"
+    dateRange.start,
+    dateRange.end
   );
   const { normalizedDates, normalizedPrices } = useNormalizedData(filteredDates, filteredPrices, 10);
 
