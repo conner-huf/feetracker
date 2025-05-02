@@ -14,6 +14,7 @@ import axios from "axios";
 import useNormalizedData from "../hooks/useNormalizedData";
 import useDateFilter from "../hooks/useDateFilter";
 import PercentChangeModule from "./PercentChangeModule";
+import CurrentPriceModule from "./CurrentPriceModule";
 
 const ProductPriceChart = ({ productName, dateRange }) => {
   const [observations, setObservations] = useState([]);
@@ -86,7 +87,10 @@ const ProductPriceChart = ({ productName, dateRange }) => {
   return (
     <div className="chart-container">
       <Line options={options} data={data} />
-      <PercentChangeModule priceData={filteredPrices} />
+      <div className="modules">
+        <PercentChangeModule priceData={filteredPrices} />
+        <CurrentPriceModule priceData={filteredPrices} />
+      </div>
     </div>
   );
 };

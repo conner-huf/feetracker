@@ -39,8 +39,8 @@ body {
   height: auto;
 }
 
-.percent-change-module {
-  margin-top: 20px;
+.module {
+  margin: 20px 10px 0 10px;;
   text-align: center;
   background-color: #f5f5f5;
   padding: 10px;
@@ -48,14 +48,13 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.percent-change-module h3 {
-  margin: 0;
-  color: #333;
-}
-
-.percent-change-module p {
+.module p {
   margin: 5px 0 0;
   font-size: 1rem;
+}
+
+.modules {
+  display: flex;
 }
 
 @media (max-width: 768px) {

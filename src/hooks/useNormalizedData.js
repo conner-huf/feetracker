@@ -1,27 +1,34 @@
 import { useMemo } from "react";
 
-const useNormalizedData = (dateLabels, priceData, ceiling = 10) => {
+const useNormalizedData = (dateLabels, priceData) => {
   const normalizedData = useMemo(() => {
-    if (dateLabels.length <= ceiling) {
-      return { normalizedDates: dateLabels, normalizedPrices: priceData };
+    if (!dateLabels || !priceData || dateLabels.length === 0 || priceData.length === 0) {
+      return { normalizedDates: [], normalizedPrices: [] };
     }
 
-    const step = Math.floor((dateLabels.length - 1) / (ceiling - 1));
+    const monthlyData = {};
+
+    // Group data points by month and calculate the sum and count for each month
+    dateLabels.forEach((date, index) => {
+      const monthKey = new Date(date).toISOString().slice(0, 7); // Format: YYYY-MM
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { sum: 0, count: 0 };
+      }
+      monthlyData[monthKey].sum += priceData[index];
+      monthlyData[monthKey].count += 1;
+    });
+
+    // Calculate average price for each month
     const normalizedDates = [];
     const normalizedPrices = [];
-
-    for (let i = 0; i < ceiling; i++) {
-      const index = i * step;
-      normalizedDates.push(dateLabels[index]);
-      normalizedPrices.push(priceData[index]);
-    }
-
-    // Ensure the last data point is included
-    normalizedDates[normalizedDates.length - 1] = dateLabels[dateLabels.length - 1];
-    normalizedPrices[normalizedPrices.length - 1] = priceData[priceData.length - 1];
+    Object.keys(monthlyData).forEach((monthKey) => {
+      normalizedDates.push(monthKey);
+      const averagePrice = monthlyData[monthKey].sum / monthlyData[monthKey].count;
+      normalizedPrices.push(averagePrice);
+    });
 
     return { normalizedDates, normalizedPrices };
-  }, [dateLabels, priceData, ceiling]);
+  }, [dateLabels, priceData]);
 
   return normalizedData;
 };

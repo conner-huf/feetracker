@@ -2,7 +2,7 @@ import React from "react";
 
 const PercentChangeModule = ({ priceData }) => {
   if (priceData.length < 2) {
-    return <div className="percent-change-module">No data</div>;
+    return <div className="module">No data</div>;
   }
 
   const filteredPriceData = priceData.filter((value, index) => value !== null || index > 0);
@@ -12,7 +12,7 @@ const PercentChangeModule = ({ priceData }) => {
   const percentChange = ((lastPrice - firstPrice) / firstPrice) * 100;
 
   return (
-    <div className="percent-change-module">
+    <div className="module">
       <p>
         <strong style={{ color: percentChange >= 0 ? "green" : "red" }}>
           {percentChange.toFixed(2)}%
